@@ -1,0 +1,19 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Dashboard Secret</title>
+<style>body{background:#000;color:#0f0;font-family:Consolas;padding:20px;}
+input,button{padding:10px;font-size:18px;margin:5px;}table{width:100%;border-collapse:collapse;margin-top:20px;}
+th,td{border:1px solid #0f0;padding:8px;text-align:left;}th{background:#003300;}</style>
+</head><body>
+<h1>Dashboard IP Secret</h1>
+<input type="password" id="p" placeholder="Mot de passe">
+<button onclick="if(document.getElementById('p').value==='123456'){show()}else{alert('Mauvais mot de passe')">Entrer</button>
+<button onclick="localStorage.clear();location.reload()">Effacer tout</button>
+<div id="out"></div>
+<script>
+function show(){
+ let logs=JSON.parse(localStorage.getItem('logs')||'[]');
+ let html=`<h2>${logs.length} IP capturées</h2><table><tr><th>Date</th><th>IP</th><th>Appareil</th></tr>`;
+ logs.reverse().forEach(l=>html+=`<tr><td>${l.date}</td><td>${l.ip}</td><td>${l.ua.substr(0,80)}...</td></tr>`);
+ document.getElementById('out').innerHTML=html+'</table>';
+}
+</script>
+</body></html>
